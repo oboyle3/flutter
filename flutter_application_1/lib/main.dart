@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -32,10 +33,40 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String? _favoriteColor; // Variable to store the favorite color
+  late Timer _timer;
+  bool _timerRunning = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      if (_timerRunning) {
+        _incrementCounter();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
+    });
+  }
+
+  void _startTimer() {
+    setState(() {
+      _timerRunning = true;
+    });
+  }
+
+  void _stopTimer() {
+    setState(() {
+      _timerRunning = false;
     });
   }
 
@@ -104,6 +135,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Your favorite color is: $_favoriteColor',
                 style: TextStyle(color: Colors.blue),
               ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _startTimer,
+                  child: Text('Start Timer'),
+                ),
+                SizedBox(width: 20),
+                ElevatedButton(
+                  onPressed: _stopTimer,
+                  child: Text('Stop Timer'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -115,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
 
 /*import 'package:flutter/material.dart';
 
