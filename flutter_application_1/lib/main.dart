@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,81 +30,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  String? _favoriteColor; // Variable to store the favorite color
-  late Timer _timer;
-  bool _timerRunning = false;
+  List<int> _numbers = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
-      if (_timerRunning) {
-        _incrementCounter();
+  void _enterNumbers() async {
+    List<int> numbers = [];
+    for (int i = 0; i < 5; i++) {
+      int? enteredNumber = await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Enter Number ${i + 1}'),
+            content: TextField(
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                // Convert the input string to an integer
+                numbers.add(int.tryParse(value) ?? 0);
+              },
+              decoration: InputDecoration(
+                hintText: 'Enter number ${i + 1}',
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(int.tryParse(numbers.last.toString()) ?? 0);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      if (enteredNumber != null) {
+        numbers.add(enteredNumber);
       }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void _incrementCounter() {
+    }
     setState(() {
-      _counter++;
+      _numbers = numbers;
     });
-  }
-
-  void _startTimer() {
-    setState(() {
-      _timerRunning = true;
-    });
-  }
-
-  void _stopTimer() {
-    setState(() {
-      _timerRunning = false;
-    });
-  }
-
-  // Function to show a dialog box for entering favorite color
-  Future<void> _showFavoriteColorDialog() async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Favorite Color'),
-          content: TextField(
-            onChanged: (value) {
-              _favoriteColor = value; // Update the favorite color variable
-            },
-            decoration: const InputDecoration(
-              hintText: 'Enter your favorite color',
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  // Update the UI with the new favorite color
-                  // You can handle the favorite color data as needed
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Save this'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -119,48 +87,29 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline6,
-            ),
             ElevatedButton(
-              onPressed: _showFavoriteColorDialog, // Show dialog on button press
-              child: const Text('Enter Favorite Color'),
+              onPressed: _enterNumbers,
+              child: const Text('Enter Numbers'),
             ),
-            if (_favoriteColor != null) // Show favorite color if entered
-              Text(
-                'Your favorite color is: $_favoriteColor',
-                style: TextStyle(color: Colors.blue),
-              ),
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _startTimer,
-                  child: Text('Start Timer'),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: _stopTimer,
-                  child: Text('Stop Timer'),
-                ),
-              ],
-            ),
+            if (_numbers.isNotEmpty)
+              Column(
+                children: [
+                  Text(
+                    'Entered Numbers:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Text(_numbers.join(', ')),
+                ],
+              ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
 }
+
 
 
 /*import 'package:flutter/material.dart';
